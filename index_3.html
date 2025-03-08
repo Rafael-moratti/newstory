@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Balada do Cavaleiro Perdido</title>
+    <style>
+        /* Estilos gerais */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Times New Roman', serif;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Tela inicial */
+        #tela-inicial {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23190a21"/><path d="M400,100 Q550,150 700,100 L700,500 Q550,450 400,500 Q250,450 100,500 L100,100 Q250,150 400,100 Z" fill="%234f2159"/><path d="M400,150 Q500,180 600,150 L600,450 Q500,420 400,450 Q300,420 200,450 L200,150 Q300,180 400,150 Z" fill="%23662d60"/><rect x="250" y="400" width="300" height="150" fill="%234f2159"/><rect x="380" y="450" width="40" height="100" fill="%23190a21"/><circle cx="150" cy="150" r="20" fill="%23f9d56e"/><circle cx="650" cy="180" r="15" fill="%23f9d56e"/><circle cx="400" cy="100" r="25" fill="%23f9d56e"/></svg>');
+            background-size: cover;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        #background-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.6;
+            background: radial-gradient(circle, rgba(79,33,89,0.6) 0%, rgba(25,10,33,1) 100%);
+        }
+
+        .tochas {
+            position: absolute;
+            width: 20px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, #ffd75e 0%, #ff5722 70%, transparent 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            filter: blur(2px);
+            box-shadow: 0 0 20px #ff5722, 0 0 40px #ff9800;
+            animation: tocha-flicker 3s infinite alternate;
+        }
+
+        @keyframes tocha-flicker {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            25% { opacity: 0.8; transform: scale(0.95); }
+            50% { opacity: 1.2; transform: scale(1.05); }
+            75% { opacity: 0.9; transform: scale(0.98); }
+        }
+
+        #titulo-jogo {
+            font-size: 4em;
+            color: #fff;
+            text-shadow: 0 0 10px #ff9800, 0 0 20px #ff9800;
+            margin-bottom: 50px;
+            z-index: 101;
+            text-align: center;
+        }
+
+        #subtitulo-jogo {
+            font-size: 1.5em;
+            color: #f9d56e;
+            text-shadow: 0 0 5px #f9d56e;
+            margin-bottom: 50px;
+            z-index: 101;
+            text-align: center;
+        }
+
+        #botao-iniciar {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            background: linear-gradient(45deg, #662d60, #4f2159);
+            color: white;
+            border: 2px solid #f9d56e;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #f9d56e;
+            transition: all 0.3s;
+            z-index: 101;
+        }
+
+        #botao-iniciar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px #f9d56e;
+        }
+
+        /* Tela de prólogo */
+        #tela-prologo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: #190a21;
+            overflow: hidden;
+        }
+
+        #texto-prologo {
+            width: 80%;
+            max-width: 800px;
+            font-size: 1.5em;
+            line-height: 1.6;
+            text-align: center;
+            transform: translateY(100%);
+            animation: scroll-up 60s linear forwards;
+            color: #f9d56e;
+            text-shadow: 0 0 5px #f9d56e;
+        }
+
+        @keyframes scroll-up {
+            from { transform: translateY(100%); }
+            to { transform: translateY(-100%); }
+        }
+
+        /* Páginas do jogo */
+        #pagina-jogo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect width="400" height="400" fill="%23190a21"/><path d="M0,0 L50,0 L50,400 L0,400 Z" fill="%234f2159"/><path d="M350,0 L400,0 L400,400 L350,400 Z" fill="%234f2159"/><circle cx="200" cy="50" r="20" fill="%23f9d56e"/></svg>');
+            background-size: cover;
+            background-repeat: repeat;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        #conteudo-pagina {
+            background-color: rgba(79, 33, 89, 0.8);
+            border-radius: 10px;
+            border: 2px solid #f9d56e;
+            padding: 30px;
+            width: 80%;
+            max-width: 800px;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(249, 213, 110, 0.5);
+            font-size: 1.2em;
+            line-height: 1.6;
+            text-align: justify;
+            margin-bottom: 40px;
+            overflow-y: auto;
+            max-height: 50vh;
+        }
+
+        #titulo-capitulo {
+            color: #f9d56e;
+            text-shadow: 0 0 5px #f9d56e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #texto-pagina {
+            margin-bottom: 30px;
+        }
+
+        #ilustracao {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            height: 200px;
+            margin: 0 auto 30px auto;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        #opcoes {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .opcao {
+            padding: 15px;
+            background-color: #662d60;
+            color: white;
+            border: 1px solid #f9d56e;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .opcao:hover {
+            background-color: #4f2159;
+            transform: translateX(10px);
+            box-shadow: 0 0 10px #f9d56e;
+        }
+
+        /* Tela de combate */
+        #tela-combate {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(to bottom, #662d60, #190a21);
+            color: white;
+            overflow: hidden;
+        }
+
+        #area-combate {
+            display: flex;
+            justify-content: space-between;
+            height: 60%;
+            padding: 20px;
+        }
+
+        .personagem, .inimigo {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 0 10px rgba(249, 213, 110, 0.7));
+        }
+
+        .personagem .avatar {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="none"/><path d="M100,40 L130,90 L70,90 Z" fill="%23f9d56e"/><rect x="85" y="90" width="30" height="60" fill="%234f2159"/><rect x="70" y="90" width="60" height="20" fill="%23662d60"/><rect x="60" y="90" width="15" height="40" fill="%234f2159"/><rect x="125" y="90" width="15" height="40" fill="%234f2159"/><circle cx="100" cy="70" r="20" fill="%23ffcc99"/></svg>');
+        }
+
+        .barra-vida {
+            width: 100%;
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 1px solid #f9d56e;
+        }
+
+        .vida {
+            height: 100%;
+            background-color: #ff5722;
+            width: 100%;
+            transition: width 0.5s;
+        }
+
+        .status {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #f9d56e;
+        }
+
+        #acoes-combate {
+            height: 40%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background-color: rgba(25, 10, 33, 0.9);
+            border-top: 2px solid #f9d56e;
+        }
+
+        #log-combate {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(79, 33, 89, 0.5);
+            border-radius: 5px;
+            border: 1px solid #f9d56e;
+        }
+
+        #itens-combate {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: rgba(79, 33, 89, 0.5);
+            border-radius: 5px;
+            border: 1px solid #f9d56e;
+        }
+
+        .item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background-color: #4f2159;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            border: 1px solid #f9d56e;
+        }
+
+        .item:hover {
+            background-color: #662d60;
+            transform: scale(1.05);
+        }
+
+        .item-nome {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .item-icone {
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .botao-acao {
+            padding: 10px;
+            font-size: 1em;
+            background-color: #662d60;
+            color: white;
+            border: 1px solid #f9d56e;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .botao-acao:hover {
+            background-color: #4f2159;
+            box-shadow: 0 0 10px #f9d56e;
+        }
+
+        /* Tela de game over e vitória */
+        #tela-resultado {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(25, 10, 33, 0.9);
+            color: white;
+        }
+
+        #mensagem-resultado {
+            font-size: 4em;
+            color: #f9d56e;
+            text-shadow: 0 0 10px #f9d56e;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        #descricao-resultado {
+            font-size: 1.5em;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        #botao-reiniciar {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            background-color: #662d60;
+            color: white;
+            border: 2px solid #f9d56e;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #f9d56e;
+            transition: all 0.3s;
+        }
+
+        #botao-reiniciar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px #f9d56e;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            #titulo-jogo {
+                font-size: 2.5em;
+                margin-bottom: 30px;
+            }
+            
+            #subtitulo-jogo {
+                font-size: 1.2em;
+                margin-bottom: 30px;
+            }
+            
+            #texto-prologo, #conteudo-pagina {
+                font-size: 1em;
+                width: 90%;
+            }
+            
+            .avatar {
+                width: 150px;
+                height: 150px;
+            }
+            
+            #itens-combate {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            #mensagem-resultado {
+                font-size: 2.5em;
+            }
+            
+            #descricao-resultado {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela Inicial -->
+    <div id="tela-inicial">
+        <div id="background-animation"></div>
+        <h1 id="titulo-jogo">A Balada do<br>Cavaleiro Perdido</h1>
+        <p id="subtitulo-jogo">Uma epopeia de bravura, donzelas, e... legumes em combate!</p>
+        <button id="botao-iniciar">Iniciar Aventura</button>
+    </div>
+
+    <!-- Tela de Prólogo -->
+    <div id="tela-prologo">
+        <div id="texto-prologo">
+            <h1>A Balada do Cavaleiro Perdido</h1>
+            <h2>Prólogo</h2>
+            <p>Em meio à noite profana, onde os trovadores modernos entoam hinos rítmicos e as tochas coloridas piscam em padrões hipnóticos, ergue-se a grandiosa Taverna da Lua Rubra. É um local de devassidão e prazer, onde os nobres e plebeus se misturam sob os auspícios de Dionísio.</p>
+            <p>Eis que, em meio ao negrume de uma madrugada de festividades e luxúria, nosso herói, o audaz cavaleiro Erick de Valdora, encontra-se absorto entre cálices dourados e música profana. Mas seu descanso não há de durar.</p>
+            <p>Pois eis que surge um arauto da calamidade: um velho bardo de trajes esfarrapados grita aos quatro ventos que a donzela Celestina, filha do Duque de Monforte, fora raptada por mãos pérfidas e levada aos aposentos superiores da taverna, sob guarda cerrada dos brutamontes do infame Barão de Salazar.</p>
+            <p>Sem hesitar, o cavaleiro se ergue, ajusta seu gibão estilizado e avança. A missão é clara: resgatar a dama antes que ela seja entregue a um destino funesto!</p>
+            <h3>A história começa...</h3>
+        </div>
+    </div>
+
+    <!-- Páginas do Jogo -->
+    <div id="pagina-jogo">
+        <h2 id="titulo-capitulo"></h2>
+        <div id="conteudo-pagina">
+            <div id="ilustracao"></div>
+            <div id="texto-pagina"></div>
+        </div>
+        <div id="opcoes"></div>
+    </div>
+
+    <!-- Tela de Combate -->
+    <div id="tela-combate">
+        <div id="area-combate">
+            <div class="personagem">
+                <div class="avatar"></div>
+                <div class="status">Erick de Valdora</div>
+                <div class="barra-vida">
+                    <div class="vida" id="vida-personagem"></div>
+                </div>
+                <div class="status" id="status-personagem">HP: 100/100</div>
+            </div>
+            <div class="inimigo">
+                <div class="avatar" id="avatar-inimigo"></div>
+                <div class="status" id="nome-inimigo">Inimigo</div>
+                <div class="barra-vida">
+                    <div class="vida" id="vida-inimigo"></div>
+                </div>
+                <div class="status" id="status-inimigo">HP: 100/100</div>
+            </div>
+        </div>
+        <div id="acoes-combate">
+            <div id="log-combate"></div>
+            <div id="itens-combate"></div>
+            <button class="botao-acao" id="botao-fugir">Tentar Fugir</button>
+        </div>
+    </div>
+
+    <!-- Tela de Resultado (Game Over / Vitória) -->
+    <div id="tela-resultado">
+        <div id="mensagem-resultado">Vitória!</div>
+        <div id="descricao-resultado"></div>
+        <button id="botao-reiniciar">Jogar Novamente</button>
+    </div>
+
+    <script>
+        // Estrutura das páginas do jogo
+        const paginas = {
+            // Capítulo 1
+            1: {
+                titulo: "Capítulo 1: O Desafio dos Guarda-Costas",
+                texto: "À porta das escadarias, dois brutamontes se erguem, verdadeiras muralhas de músculos e arrogância. Seus braços cruzados e olhares ameaçadores deixam claro que não permitirão a passagem de ninguém. \"Ei, você aí! Onde pensa que vai?\" - rosna um deles, estufando o peito. O outro estica o pescoço e estala os dedos, pronto para a briga.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><rect x="120" y="0" width="160" height="200" fill="%23662d60"/><rect x="190" y="0" width="20" height="200" fill="%23f9d56e"/><path d="M110,90 L120,90 L120,170 L100,170 Z" fill="%234f2159"/><path d="M290,90 L280,90 L280,170 L300,170 Z" fill="%234f2159"/><circle cx="150" cy="50" r="30" fill="%23ffcc99"/><circle cx="250" cy="50" r="30" fill="%23ffcc99"/><rect x="120" y="90" width="60" height="80" fill="%23333333"/><rect x="220" y="90" width="60" height="80" fill="%23333333"/></svg>',
+                opcoes: [
+                    { texto: "Enfrentá-los com as mãos limpas, no estilo nobre do combate corpo a corpo", proxima: 2 },
+                    { texto: "Usar um item inusitado da mesa para distraí-los ou incapacitar um deles", combate: "guardas" },
+                    { texto: "Tentar enganá-los com lábia e astúcia", proxima: 3 }
+                ]
+            },
+            2: {
+                titulo: "Capítulo 1: Combate Nobre",
+                texto: "Você se posiciona em postura de combate, os punhos erguidos ao estilo dos pugilistas da capital. \"Vamos resolver isso como homens de honra\", você declara. Os guardas riem e avançam juntos. Por mais valoroso que seja, enfrentar dois brutamontes treinados de mãos vazias não foi uma escolha sábia. Após um breve combate desigual, você se vê arremessado para fora da taverna, sua honra manchada e sua missão fracassada.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><path d="M150,80 L250,80 L270,180 L130,180 Z" fill="%234f2159"/><circle cx="200" cy="50" r="30" fill="%23ffcc99"/><path d="M0,180 L400,180 L400,200 L0,200 Z" fill="%23662d60"/><path d="M170,120 L170,160" stroke="%23f9d56e" stroke-width="5"/><path d="M230,120 L230,160" stroke="%23f9d56e" stroke-width="5"/><path d="M180,70 L190,65" stroke="black" stroke-width="2"/><path d="M220,70 L210,65" stroke="black" stroke-width="2"/><path d="M190,80 L210,80" stroke="black" stroke-width="2"/></svg>',
+                opcoes: [
+                    { texto: "Fim da aventura. Você fracassou em sua missão.", final: "fracasso1" }
+                ]
+            },
+            3: {
+                titulo: "Capítulo 1: Astúcia Bem-Sucedida",
+                texto: "Com a elegância de um cortesão e a astúcia de uma raposa, você se aproxima dos guardas. \"Cavalheiros, trago uma mensagem urgente do Barão. A moça deve ser transferida imediatamente para o carruagem nos fundos. Há espiões do Duque na taverna!\" Sua voz não treme, seu olhar é firme. Os guardas se entreolham, confusos. O mais alto coça a cabeça e diz: \"Ninguém nos avisou disso\". Você suspira dramaticamente: \"É claro que não! É uma operação secreta. Por que acham que o Barão mandou alguém discreto como eu, e não um mensageiro oficial?\". Convencidos pela sua confiança inabalável, eles lhe dão passagem. Você sobe as escadas rapidamente, sentindo o coração acelerar. A primeira barreira foi vencida pela astúcia!",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><path d="M150,20 L250,20 L250,180 L150,180 Z" fill="%234f2159"/><rect x="140" y="20" width="120" height="20" fill="%23662d60"/><circle cx="200" cy="80" r="20" fill="%23ffcc99"/><path d="M180,130 L220,130 L210,180 L190,180 Z" fill="%23662d60"/><rect x="180" y="130" width="40" height="20" fill="%23f9d56e"/><circle cx="150" cy="70" r="20" fill="%23ffcc99"/><circle cx="250" cy="70" r="20" fill="%23ffcc99"/><path d="M130,100 L170,100 L160,150 L140,150 Z" fill="%23333333"/><path d="M230,100 L270,100 L260,150 L240,150 Z" fill="%23333333"/></svg>',
+                opcoes: [
+                    { texto: "Continuar para a cozinha da taverna", proxima: 4 }
+                ]
+            },
+            // Capítulo 2
+            4: {
+                titulo: "Capítulo 2: A Cozinha do Caos",
+                texto: "Seguindo pelo corredor, você chega à movimentada cozinha da taverna. O ar está carregado de vapor e aromas de especiarias. Cozinheiros e auxiliares correm de um lado para outro, preparando os pratos para os fregueses embriagados. De repente, um dos cozinheiros o reconhece e grita: \"É ele! O intruso de quem o Barão nos alertou!\". Em segundos, estão todos voltados para você, empunhando facas de corte, colheres de pau e outros utensílios culinários como armas improvisadas. O caminho para o salão do Barão passa pelo outro lado desta cozinha frenética.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><rect x="50" y="50" width="300" height="100" fill="%234f2159"/><rect x="80" y="70" width="60" height="40" fill="%23662d60"/><rect x="170" y="70" width="60" height="40" fill="%23662d60"/><rect x="260" y="70" width="60" height="40" fill="%23662d60"/><circle cx="110" cy="60" r="10" fill="%23ffcc99"/><circle cx="200" cy="60" r="10" fill="%23ffcc99"/><circle cx="290" cy="60" r="10" fill="%23ffcc99"/><path d="M90,70 L90,110" stroke="%23f9d56e" stroke-width="3"/><path d="M180,70 L180,110" stroke="%23f9d56e" stroke-width="3"/><path d="M270,70 L270,110" stroke="%23f9d56e" stroke-width="3"/><circle cx="310" cy="130" r="15" fill="%23ffcc99"/><path d="M295,145 L325,145 L320,180 L300,180 Z" fill="%234f2159"/></svg>',
+                opcoes: [
+                    { texto: "Utilizar os próprios ingredientes da cozinha como armas", combate: "cozinheiros" },
+                    { texto: "Correr e tentar atravessar o ambiente em velocidade", proxima: 5 },
+                    { texto: "Aproveitar a distração para se disfarçar como um dos cozinheiros", proxima: 6 }
+                ]
+            },
+            5: {
+                titulo: "Capítulo 2: Corrida Desastrada",
+                texto: "Confiando em sua velocidade, você decide correr através da cozinha. Contorna uma mesa, salta por cima de um banco e escorrega em uma poça de molho. Enquanto tenta manter o equilíbrio, sua cabeça colide com uma pilha de panelas penduradas, criando um estrondo ensurdecedor. Desorientado pelo golpe e cercado por cozinheiros furiosos, sua aventura chega a um fim prematuro.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><path d="M120,100 C130,60 270,60 280,100" fill="none" stroke="%23662d60" stroke-width="5"/><circle cx="200" cy="120" r="20" fill="%23ffcc99"/><path d="M180,140 L220,140 L210,180 L190,180 Z" fill="%234f2159"/><path d="M160,120 L170,110" stroke="%23f9d56e" stroke-width="2"/><path d="M240,120 L230,110" stroke="%23f9d56e" stroke-width="2"/><path d="M180,100 L190,105" stroke="black" stroke-width="2"/><path d="M220,100 L210,105" stroke="black" stroke-width="2"/><path d="M190,120 L210,120" stroke="black" stroke-width="2"/><circle cx="150" cy="80" r="10" fill="%23888888"/><circle cx="170" cy="70" r="12" fill="%23888888"/><circle cx="190" cy="65" r="15" fill="%23888888"/></svg>',
+                opcoes: [
+                    { texto: "Fim da aventura. Você foi capturado pelos cozinheiros.", final: "fracasso2" }
+                ]
+            },
+            6: {
+                titulo: "Capítulo 2: O Disfarce Perfeito",
+                texto: "Com a agilidade de um gato, você se esgueira por trás de um armário enquanto os cozinheiros procuram freneticamente pelo intruso. Encontrando um avental e um chapéu de cozinheiro, você rapidamente os veste e assume uma postura ocupada, mexendo um caldeirão de sopa como se sua vida dependesse disso. \"Ei, você! O novo ajudante!\", grita o chefe de cozinha, \"Leve esta bandeja para o salão do Barão, agora!\". Você mal consegue esconder o sorriso de satisfação. O destino lhe entregou exatamente o que precisava - um acesso direto ao seu objetivo. Com a bandeja nas mãos, você atravessa a cozinha e segue em direção ao salão do Barão.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><circle cx="200" cy="60" r="20" fill="%23ffcc99"/><path d="M170,80 L230,80 L220,150 L180,150 Z" fill="%23ffffff"/><rect x="180" y="50" width="40" height="20" fill="%23ffffff"/><path d="M170,100 L150,120" stroke="%234f2159" stroke-width="3"/><path d="M230,100 L250,120" stroke="%234f2159" stroke-width="3"/><rect x="185" y="110" width="30" height="10" fill="%23f9d56e"/><path d="M190,80 L200,77 L210,80" stroke="black" stroke-width="2"/></svg>',
+                opcoes: [
+                    { texto: "Continuar para o salão do Barão", proxima: 7 }
+                ]
+            },
+            // Capítulo 3
+            7: {
+                titulo: "Capítulo 3: O Salão do Barão",
+                texto: "O salão do Barão de Salazar reluz em ostentação vulgar. Tapeçarias de caça adornam as paredes, candelabros dourados pendem do teto. No centro, sentado em um trono ornamentado, está o próprio Barão - um homem de bigodes retorcidos e sorriso malicioso. Ao lado dele, amarrada a uma cadeira, a bela Celestina olha para você com esperança em seus olhos. \"Ah, finalmente minha refeição!\", exclama o Barão. Ao colocar a bandeja na mesa, ele percebe que não é um simples criado. \"Espere um momento... Você não é...\" Antes que ele termine, seu último guarda, um gigante de quase dois metros, se interpõe entre vocês. Surpreendentemente, ele empunha um enorme frango assado como se fosse uma clava.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><rect x="50" y="50" width="300" height="150" fill="%234f2159"/><path d="M175,100 L225,100 L215,180 L185,180 Z" fill="%23662d60"/><rect x="150" y="70" width="100" height="30" fill="%23662d60"/><circle cx="200" cy="50" r="20" fill="%23ffcc99"/><path d="M180,60 L220,60" stroke="black" stroke-width="3"/><path d="M270,120 L320,120 L310,170 L280,170 Z" fill="%23333333"/><circle cx="300" cy="100" r="20" fill="%23ffcc99"/><circle cx="100" cy="100" r="15" fill="%23ffcc99"/><path d="M85,115 L115,115 L110,150 L90,150 Z" fill="%23662d60"/><path d="M80,110 L120,110" stroke="%23f9d56e" stroke-width="2"/></svg>',
+                opcoes: [
+                    { texto: "Desafiar o guarda em um duelo de força", proxima: 8 },
+                    { texto: "Usar um item inesperado para derrotá-lo", combate: "gigante" },
+                    { texto: "Enganar o Barão, fingindo aliança e traindo-o no último momento", proxima: 9 }
+                ]
+            },
+            8: {
+                titulo: "Capítulo 3: Duelo Desigual",
+                texto: "\"Vamos resolver isso como homens\", você declara, estufando o peito e assumindo posição de combate. O gigante sorri, revela dentes faltando, e avança. O duelo é breve e doloroso. Apesar de sua coragem, a diferença de força física é simplesmente grande demais. Após alguns golpes bem posicionados do frango assado, você se encontra inconsciente no chão, enquanto o Barão gargalha e Celestina chora silenciosamente.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><path d="M180,160 L230,170 L220,180 L170,175 Z" fill="%234f2159"/><circle cx="160" cy="150" r="15" fill="%23ffcc99"/><path d="M270,120 L320,120 L310,170 L280,170 Z" fill="%23333333"/><circle cx="300" cy="100" r="20" fill="%23ffcc99"/><path d="M290,90 L300,85" stroke="black" stroke-width="2"/><path d="M310,90 L300,85" stroke="black" stroke-width="2"/><path d="M290,100 L310,100" stroke="black" stroke-width="2"/><path d="M140,150 L150,145" stroke="black" stroke-width="2"/><path d="M150,155 L160,152" stroke="black" stroke-width="2"/><path d="M0,180 L400,180 L400,200 L0,200 Z" fill="%23662d60"/></svg>',
+                opcoes: [
+                    { texto: "Fim da aventura. Você foi derrotado pelo gigante.", final: "fracasso3" }
+                ]
+            },
+            9: {
+                titulo: "Capítulo 3: Traição Bem-Sucedida",
+                texto: "\"Meu senhor Barão\", você começa, fazendo uma reverência exagerada, \"fui enviado pelo Duque como negociador. Ele oferece um resgate três vezes maior se sua filha for devolvida intacta\". O Barão ergue uma sobrancelha, interessado. \"Deixe-me examinar a donzela para avaliar seu estado atual\", você sugere. Quando ele permite sua aproximação, você rapidamente desata as cordas de Celestina enquanto afirma estar verificando se ela não está ferida. Em um movimento rápido, você empurra a pesada mesa sobre o Barão e seu guarda, bloqueando-os momentaneamente. \"Agora, milady!\", você grita, pegando Celestina pela mão e correndo para a porta. O plano é audacioso e funciona perfeitamente! Vocês fogem pelo corredor enquanto ouvem os gritos furiosos do Barão e o som de móveis sendo arremessados.",
+                ilustracao: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="none"/><rect x="240" y="100" width="100" height="60" fill="%23662d60"/><circle cx="120" cy="80" r="20" fill="%23ffcc99"/><path d="M100,100 L140,100 L135,150 L105,150 Z" fill="%234f2159"/><circle cx="170" cy="80" r="18" fill="%23ffcc99"/><path d="M155,100 L185,100 L180,150 L160,150 Z" fill="%23f9d56e"/><path d="M180,70 L190,65" stroke="black" stroke-width="2"/><path d="M170,70 L160,65" stroke="black" stroke-width="2"/><path d="M0,180 L400,180 L400,200 L0,200 Z" fill="%23662d60"/></svg>',
+                opcoes: [
+                    { texto: "Continuar para o epílogo vitorioso", final: "vitoria" }
+                ]
+            }
+        };
+
+        // Definições dos inimigos para combate
+        const inimigos = {
+            guardas: {
+                nome: "Guardas Brutamontes",
+                hp: 80,
+                maxHp: 80,
+                proxima: 4,
+                avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="none"/><rect x="60" y="30" width="80" height="140" fill="%23333333"/><circle cx="100" cy="60" r="30" fill="%23ffcc99"/><rect x="80" y="90" width="40" height="20" fill="%23662d60"/><path d="M70,60 L80,55" stroke="black" stroke-width="2"/><path d="M130,60 L120,55" stroke="black" stroke-width="2"/><path d="M90,70 L110,70" stroke="black" stroke-width="2"/></svg>',
+                itens: [
+                    {
+                        nome: "Caneca de Cerveja",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M10,5 L20,5 L22,25 L8,25 Z" fill="%23f9d56e"/><path d="M10,5 L20,5 L22,10 L8,10 Z" fill="white"/><path d="M20,5 L23,8 L23,20 L22,25 L20,25 Z" fill="%23d4af37"/></svg>',
+                        dano: 20,
+                        mensagem: "Você arremessa a caneca de cerveja com precisão, acertando um dos guardas em cheio na testa. O impacto e o líquido nos olhos o deixam momentaneamente cego e enfurecido!"
+                    },
+                    {
+                        nome: "Peixe Frito",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M5,16 Q11,10 16,16 Q21,22 27,16" fill="none" stroke="%23d4af37" stroke-width="2"/><ellipse cx="16" cy="16" rx="10" ry="6" fill="%23d4af37"/><circle cx="10" cy="14" r="1" fill="black"/></svg>',
+                        dano: 25,
+                        mensagem: "Você pega um peixe frito da mesa próxima e o arremessa com força. O peixe gorduroso gruda na cara do guarda, que se debate tentando se livrar do cheiro e da gordura!"
+                    },
+                    {
+                        nome: "Banqueta de Madeira",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><rect x="8" y="8" width="16" height="8" fill="%23662d60"/><path d="M10,16 L10,24" stroke="%23662d60" stroke-width="2"/><path d="M22,16 L22,24" stroke="%23662d60" stroke-width="2"/></svg>',
+                        dano: 35,
+                        mensagem: "Você ergue uma banqueta de madeira e a arremessa contra os guardas. Ela se despedaça ao contato, derrubando um deles e atordoando o outro!"
+                    },
+                    {
+                        nome: "Vinho Arremessado",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M14,8 L18,8 L20,24 L12,24 Z" fill="%234f2159"/><rect x="15" y="5" width="2" height="3" fill="%23662d60"/></svg>',
+                        dano: 15,
+                        mensagem: "Você agarra uma garrafa de vinho e a sacode vigorosamente antes de abri-la na direção dos guardas. O líquido espumante atinge seus olhos, causando ardência e confusão!"
+                    }
+                ]
+            },
+            cozinheiros: {
+                nome: "Cozinheiros Furiosos",
+                hp: 70,
+                maxHp: 70,
+                proxima: 7,
+                avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="none"/><rect x="70" y="70" width="60" height="100" fill="white"/><circle cx="100" cy="50" r="25" fill="%23ffcc99"/><rect x="75" y="25" width="50" height="25" fill="white"/><path d="M80,60 L90,55" stroke="black" stroke-width="2"/><path d="M120,60 L110,55" stroke="black" stroke-width="2"/><path d="M90,70 L110,70" stroke="red" stroke-width="2"/><rect x="60" y="90" width="30" height="5" fill="%23662d60"/></svg>',
+                itens: [
+                    {
+                        nome: "Alho-Poró",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M16,5 L16,30" stroke="%2390ee90" stroke-width="8"/><path d="M16,5 L16,15" stroke="white" stroke-width="8"/></svg>',
+                        dano: 25,
+                        mensagem: "Você empunha um alho-poró como uma espada, golpeando os cozinheiros atônitos com sua 'arma' verde e flexível. As folhas atingem o rosto de um deles com um estalo satisfatório!"
+                    },
+                    {
+                        nome: "Pimenta em Pó",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><circle cx="16" cy="16" r="10" fill="%23ff5722"/><path d="M10,10 L22,22" stroke="white" stroke-width="1"/><path d="M10,22 L22,10" stroke="white" stroke-width="1"/></svg>',
+                        dano: 30,
+                        mensagem: "Você agarra um pote de pimenta em pó e sopra uma nuvem vermelha na direção dos cozinheiros. Eles tossem, espirram e lacrimejam, temporariamente incapazes de enxergar através da nuvem ardente!"
+                    },
+                    {
+                        nome: "Presunto Inteiro",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M8,10 L24,10 L22,22 L10,22 Z" fill="%23ff9d8c"/><path d="M10,10 L22,10 L20,15 L12,15 Z" fill="%23ffb59d"/></svg>',
+                        dano: 35,
+                        mensagem: "Você tira um pesado presunto defumado do gancho e o gira como um mangual improvisado. O impacto é surpreendentemente eficaz, lançando os cozinheiros longe com uma força inesperada!"
+                    },
+                    {
+                        nome: "Bacia de Massa",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><ellipse cx="16" cy="18" rx="10" ry="5" fill="%23662d60"/><ellipse cx="16" cy="16" rx="10" ry="5" fill="%23f9e5bc"/></svg>',
+                        dano: 20,
+                        mensagem: "Você atira uma bacia cheia de massa pegajosa nos cozinheiros. A mistura gruda em seus rostos e cabelos, impedindo-os de ver e se mover adequadamente. Eles se debatem tentando limpar a massa tenaz!"
+                    },
+                    {
+                        nome: "Cacho de Bananas",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M16,8 Q12,10 10,15" stroke="%23f9d56e" stroke-width="4"/><path d="M16,8 Q17,12 16,18" stroke="%23f9d56e" stroke-width="4"/><path d="M16,8 Q20,10 22,15" stroke="%23f9d56e" stroke-width="4"/></svg>',
+                        dano: 15,
+                        mensagem: "Você agarra um cacho de bananas e começa a lançar as frutas individualmente. As bananas espalham-se pelo chão criando uma área escorregadia. Os cozinheiros pisam nelas e caem de forma cômica, deslizando em direções aleatórias!"
+                    }
+                ]
+            },
+            gigante: {
+                nome: "Gigante com Frango",
+                hp: 100,
+                maxHp: 100,
+                proxima: "vitoria",
+                avatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="none"/><rect x="70" y="70" width="60" height="110" fill="%23333333"/><rect x="60" y="90" width="80" height="20" fill="%23662d60"/><circle cx="100" cy="50" r="30" fill="%23ffcc99"/><path d="M80,50 L95,45" stroke="black" stroke-width="2"/><path d="M120,50 L105,45" stroke="black" stroke-width="2"/><path d="M90,65 L110,65" stroke="black" stroke-width="2"/><path d="M40,100 L60,80" stroke="%23d4af37" stroke-width="10"/></svg>',
+                itens: [
+                    {
+                        nome: "Melancia Rolante",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><circle cx="16" cy="16" r="10" fill="%2332cd32"/><path d="M10,12 L22,12" stroke="darkgreen" stroke-width="1"/><path d="M10,16 L22,16" stroke="darkgreen" stroke-width="1"/><path d="M10,20 L22,20" stroke="darkgreen" stroke-width="1"/><circle cx="16" cy="16" r="8" fill="%23ff6666"/></svg>',
+                        dano: 35,
+                        mensagem: "Você encontra uma enorme melancia na mesa de banquete e a rola no chão. O gigante, tentando equilibrar-se com seu frango, pisa na fruta e escorrega espetacularmente, caindo com um estrondo que sacode toda a sala!"
+                    },
+                    {
+                        nome: "Pimenta Malagueta",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M16,8 Q22,14 20,24 Q15,30 12,24 Q10,14 16,8" fill="%23ff0000"/><path d="M16,8 Q16,10 16,12" stroke="%2332cd32" stroke-width="2"/></svg>',
+                        dano: 40,
+                        mensagem: "Você agarra uma pimenta malagueta da mesa e a lança com precisão nos olhos do gigante. Ele larga o frango imediatamente e começa a esfregar os olhos, uivando de dor. A ardência é insuportável, e o gigante tropeça cegamente, colidindo com uma coluna!"
+                    },
+                    {
+                        nome: "Jarra de Mel",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><path d="M12,8 L20,8 L22,24 L10,24 Z" fill="%23f9d56e"/><rect x="14" y="5" width="4" height="3" fill="%23662d60"/></svg>',
+                        dano: 25,
+                        mensagem: "Você derrama uma jarra inteira de mel pegajoso no chão. O gigante avança e fica completamente preso, seus pés aderindo à superfície como se estivesse em areia movediça. Quanto mais ele luta, mais se enreda no mel viscoso!"
+                    },
+                    {
+                        nome: "Colher de Pau",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><rect x="14" y="5" width="4" height="20" fill="%23d4af37"/><circle cx="16" cy="25" r="5" fill="%23d4af37"/></svg>',
+                        dano: 20,
+                        mensagem: "Você agarra uma colher de pau e, com uma agilidade digna de um esgrimista, golpeia repetidamente o gigante. Embora a arma seja ridícula, sua velocidade e precisão nos pontos sensíveis causam danos surpreendentes!"
+                    },
+                    {
+                        nome: "Abóbora Gigante",
+                        icone: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="none"/><ellipse cx="16" cy="18" rx="10" ry="8" fill="%23ff5722"/><path d="M16,10 L16,5" stroke="%2332cd32" stroke-width="2"/></svg>',
+                        dano: 45,
+                        mensagem: "Você ergue uma abóbora gigante de decoração e, reunindo todas as suas forças, a arremessa. A abóbora explode ao atingir o gigante, cobrindo-o com polpa e sementes. A força do impacto e o choque o fazem cambalear para trás, derrubando a mesa do Barão!"
+                    }
+                ]
+            }
+        };
+
+        // Textos dos finais do jogo
+        const finais = {
+            fracasso1: {
+                mensagem: "Derrota!",
+                descricao: "Sua bravura foi admirável, mas insuficiente. Os guardas riram de sua tentativa e o arremessaram para fora da taverna. A donzela Celestina permanece cativa, seu destino incerto. Talvez na próxima vez, um plano mais astuto seja necessário..."
+            },
+            fracasso2: {
+                mensagem: "Fracasso!",
+                descricao: "Sua correria desastrada pela cozinha terminou em um estrondoso fracasso. Capturado pelos cozinheiros enfurecidos, você foi entregue aos guardas do Barão. Celestina olha tristemente pela janela enquanto você é escoltado para fora da taverna. A missão de resgate falhou miseravelmente."
+            },
+            fracasso3: {
+                mensagem: "Derrota!",
+                descricao: "O gigante provou ser um adversário formidável demais para um confronto direto. Sua tentativa corajosa terminou com você sendo derrotado por um frango assado - uma história que certamente os bardos não contarão. A donzela permanece nas garras do Barão, e seu fracasso pesa em seu coração."
+            },
+            vitoria: {
+                mensagem: "Vitória Gloriosa!",
+                descricao: "Com Celestina ao seu lado, você escapa da taverna enquanto o caos se instaura atrás de vocês. O Barão de Salazar grita promessas de vingança, mas por ora, sua missão foi um sucesso retumbante! A donzela está salva, sua reputação cresceu e uma nova balada nasce - a história do audacioso cavaleiro que enfrentou guardas e cozinheiros com armas improvisadas e astúcia incomparável. 'A Balada do Cavaleiro Perdido' ecoará por todas as tavernas do reino por muitos anos!"
+            }
+        };
+
+        // Estado do jogo
+        let estadoJogo = {
+            paginaAtual: 1,
+            emCombate: false,
+            inimigoAtual: null,
+            jogador: {
+                hp: 100,
+                maxHp: 100
+            }
+        };
+
+        // Elementos do DOM
+        const telaInicial = document.getElementById('tela-inicial');
+        const telaPrologo = document.getElementById('tela-prologo');
+        const paginaJogo = document.getElementById('pagina-jogo');
+        const telaCombate = document.getElementById('tela-combate');
+        const telaResultado = document.getElementById('tela-resultado');
+        const tituloCapitulo = document.getElementById('titulo-capitulo');
+        const ilustracao = document.getElementById('ilustracao');
+        const textoPagina = document.getElementById('texto-pagina');
+        const opcoes = document.getElementById('opcoes');
+        const botaoIniciar = document.getElementById('botao-iniciar');
+        const botaoReiniciar = document.getElementById('botao-reiniciar');
+        const botaoFugir = document.getElementById('botao-fugir');
+        const logCombate = document.getElementById('log-combate');
+        const itensCombate = document.getElementById('itens-combate');
+        const avatarInimigo = document.getElementById('avatar-inimigo');
+        const nomeInimigo = document.getElementById('nome-inimigo');
+        const vidaPersonagem = document.getElementById('vida-personagem');
+        const vidaInimigo = document.getElementById('vida-inimigo');
+        const statusPersonagem = document.getElementById('status-personagem');
+        const statusInimigo = document.getElementById('status-inimigo');
+        const mensagemResultado = document.getElementById('mensagem-resultado');
+        const descricaoResultado = document.getElementById('descricao-resultado');
+
+        // Criar tochas para animação da tela inicial
+        function criarTochas() {
+            const backgroundAnimation = document.getElementById('background-animation');
+            for (let i = 0; i < 15; i++) {
+                const tocha = document.createElement('div');
+                tocha.classList.add('tochas');
+                tocha.style.left = `${Math.random() * 100}%`;
+                tocha.style.top = `${Math.random() * 100}%`;
+                tocha.style.animationDelay = `${Math.random() * 3}s`;
+                backgroundAnimation.appendChild(tocha);
+            }
+        }
+
+        // Iniciar jogo
+        function iniciarJogo() {
+            telaInicial.style.display = 'none';
+            telaPrologo.style.display = 'flex';
+            
+            // Após o prólogo, mostrar a primeira página
+            setTimeout(() => {
+                telaPrologo.style.display = 'none';
+                paginaJogo.style.display = 'flex';
+                mostrarPagina(1);
+            }, 60000); // 60 segundos para o prólogo
+        }
+
+        // Mostrar uma página específica
+        function mostrarPagina(numeroPagina) {
+            const pagina = paginas[numeroPagina];
+            if (!pagina) return;
+            
+            estadoJogo.paginaAtual = numeroPagina;
+            
+            tituloCapitulo.textContent = pagina.titulo;
+            textoPagina.textContent = pagina.texto;
+            
+            if (pagina.ilustracao) {
+                ilustracao.style.display = 'block';
+                ilustracao.style.backgroundImage = `url(${pagina.ilustracao})`;
+            } else {
+                ilustracao.style.display = 'none';
+            }
+            
+            opcoes.innerHTML = '';
+            
+            pagina.opcoes.forEach(opcao => {
+                const botaoOpcao = document.createElement('button');
+                botaoOpcao.classList.add('opcao');
+                botaoOpcao.textContent = opcao.texto;
+                
+                if (opcao.proxima) {
+                    botaoOpcao.addEventListener('click', () => mostrarPagina(opcao.proxima));
+                } else if (opcao.combate) {
+                    botaoOpcao.addEventListener('click', () => iniciarCombate(opcao.combate));
+                } else if (opcao.final) {
+                    botaoOpcao.addEventListener('click', () => finalizarJogo(opcao.final));
+                }
+                
+                opcoes.appendChild(botaoOpcao);
+            });
+
+            window.scrollTo(0, 0);
+        }
+
+        // Iniciar combate
+        function iniciarCombate(tipoInimigo) {
+            const inimigo = inimigos[tipoInimigo];
+            if (!inimigo) return;
+            
+            estadoJogo.emCombate = true;
+            estadoJogo.inimigoAtual = {
+                ...inimigo,
+                hp: inimigo.hp
+            };
+            
+            paginaJogo.style.display = 'none';
+            telaCombate.style.display = 'flex';
+            
+            // Configurar interface de combate
+            avatarInimigo.style.backgroundImage = `url(${inimigo.avatar})`;
+            nomeInimigo.textContent = inimigo.nome;
+            logCombate.innerHTML = `<p>Você enfrenta ${inimigo.nome}! Escolha um item para atacar!</p>`;
+            
+            // Mostrar itens disponíveis
+            itensCombate.innerHTML = '';
+            inimigo.itens.forEach(item => {
+                const divItem = document.createElement('div');
+                divItem.classList.add('item');
+                
+                const iconeItem = document.createElement('div');
+                iconeItem.classList.add('item-icone');
+                iconeItem.style.backgroundImage = `url(${item.icone})`;
+                
+                const nomeItem = document.createElement('div');
+                nomeItem.classList.add('item-nome');
+                nomeItem.textContent = item.nome;
+                
+                divItem.appendChild(iconeItem);
+                divItem.appendChild(nomeItem);
+                
+                divItem.addEventListener('click', () => usarItem(item));
+                
+                itensCombate.appendChild(divItem);
+            });
+            
+            atualizarBarrasVida();
+        }
+
+        // Atualizar barras de vida
+        function atualizarBarrasVida() {
+            const percentualVidaJogador = (estadoJogo.jogador.hp / estadoJogo.jogador.maxHp) * 100;
+            const percentualVidaInimigo = (estadoJogo.inimigoAtual.hp / estadoJogo.inimigoAtual.maxHp) * 100;
+            
+            vidaPersonagem.style.width = `${percentualVidaJogador}%`;
+            vidaInimigo.style.width = `${percentualVidaInimigo}%`;
+            
+            statusPersonagem.textContent = `HP: ${estadoJogo.jogador.hp}/${estadoJogo.jogador.maxHp}`;
+            statusInimigo.textContent = `HP: ${estadoJogo.inimigoAtual.hp}/${estadoJogo.inimigoAtual.maxHp}`;
+        }
+
+        // Usar item no combate
+        function usarItem(item) {
+            if (!estadoJogo.emCombate) return;
+            
+            // Jogador ataca com o item
+            logCombate.innerHTML += `<p>${item.mensagem}</p>`;
+            estadoJogo.inimigoAtual.hp = Math.max(0, estadoJogo.inimigoAtual.hp - item.dano);
+            logCombate.innerHTML += `<p>Você causa ${item.dano} de dano!</p>`;
+            
+            // Verificar se o inimigo foi derrotado
+            if (estadoJogo.inimigoAtual.hp <= 0) {
+                logCombate.innerHTML += `<p>Você derrotou ${estadoJogo.inimigoAtual.nome}!</p>`;
+                atualizarBarrasVida();
+                
+                setTimeout(() => {
+                    telaCombate.style.display = 'none';
+                    paginaJogo.style.display = 'flex';
+                    estadoJogo.emCombate = false;
+                    
+                    if (estadoJogo.inimigoAtual.proxima === "vitoria") {
+                        finalizarJogo("vitoria");
+                    } else {
+                        mostrarPagina(estadoJogo.inimigoAtual.proxima);
+                    }
+                }, 2000);
+                
+                return;
+            }
+            
+            // Inimigo contra-ataca
+            const danoInimigo = Math.floor(Math.random() * 15) + 10; // Dano entre 10-24
+            estadoJogo.jogador.hp = Math.max(0, estadoJogo.jogador.hp - danoInimigo);
+            
+            logCombate.innerHTML += `<p>${estadoJogo.inimigoAtual.nome} contra-ataca e causa ${danoInimigo} de dano!</p>`;
+            
+            // Verificar se o jogador foi derrotado
+            if (estadoJogo.jogador.hp <= 0) {
+                logCombate.innerHTML += `<p>Você foi derrotado!</p>`;
+                atualizarBarrasVida();
+                
+                setTimeout(() => {
+                    telaCombate.style.display = 'none';
+                    finalizarJogo('fracasso2');
+                }, 2000);
+                
+                return;
+            }
+            
+            atualizarBarrasVida();
+            logCombate.scrollTop = logCombate.scrollHeight;
+        }
+
+        // Tentar fugir do combate
+        function tentarFugir() {
+            if (!estadoJogo.emCombate) return;
+            
+            // 30% de chance de fugir
+            if (Math.random() < 0.3) {
+                logCombate.innerHTML += `<p>Você conseguiu fugir! Mas sua missão foi um fracasso...</p>`;
+                
+                setTimeout(() => {
+                    telaCombate.style.display = 'none';
+                    finalizarJogo('fracasso2');
+                }, 2000);
+            } else {
+                logCombate.innerHTML += `<p>Você tentou fugir, mas não conseguiu!</p>`;
+                
+                // Inimigo ataca com vantagem
+                const danoInimigo = Math.floor(Math.random() * 20) + 15; // Dano maior: 15-34
+                estadoJogo.jogador.hp = Math.max(0, estadoJogo.jogador.hp - danoInimigo);
+                
+                logCombate.innerHTML += `<p>${estadoJogo.inimigoAtual.nome} aproveita sua distração e causa ${danoInimigo} de dano!</p>`;
+                
+                // Verificar se o jogador foi derrotado
+                if (estadoJogo.jogador.hp <= 0) {
+                    logCombate.innerHTML += `<p>Você foi derrotado!</p>`;
+                    atualizarBarrasVida();
+                    
+                    setTimeout(() => {
+                        telaCombate.style.display = 'none';
+                        finalizarJogo('fracasso2');
+                    }, 2000);
+                    
+                    return;
+                }
+                
+                atualizarBarrasVida();
+            }
+            
+            logCombate.scrollTop = logCombate.scrollHeight;
+        }
+
+        // Finalizar jogo (mostrar resultado final)
+        function finalizarJogo(tipoFinal) {
+            const final = finais[tipoFinal];
+            if (!final) return;
+            
+            telaResultado.style.display = 'flex';
+            mensagemResultado.textContent = final.mensagem;
+            descricaoResultado.textContent = final.descricao;
+        }
+
+        // Reiniciar jogo
+        function reiniciarJogo() {
+            // Resetar estado do jogo
+            estadoJogo = {
+                paginaAtual: 1,
+                emCombate: false,
+                inimigoAtual: null,
+                jogador: {
+                    hp: 100,
+                    maxHp: 100
+                }
+            };
+            
+            // Esconder todas as telas e mostrar a inicial
+            telaInicial.style.display = 'flex';
+            telaPrologo.style.display = 'none';
+            paginaJogo.style.display = 'none';
+            telaCombate.style.display = 'none';
+            telaResultado.style.display = 'none';
+        }
+
+        // Event listeners
+        botaoIniciar.addEventListener('click', iniciarJogo);
+        botaoReiniciar.addEventListener('click', reiniciarJogo);
+        botaoFugir.addEventListener('click', tentarFugir);
+
+        // Inicialização
+        criarTochas();
+    </script>
+</body>
+</html>
